@@ -21,7 +21,7 @@ export class AuthService {
     });
     if (!user) throw new ForbiddenException('User not found');
     //compare the password
-    const isValid = await argon.verify(user.hash, dto.password);
+    const isValid = await argon.verify(user.password, dto.password);
     if (!isValid) throw new ForbiddenException('Invalid credentials');
     return this.accessToken(user.id, user.email);
   }
@@ -33,11 +33,12 @@ export class AuthService {
     try {
       const user = await this.prisma.user.create({
         data: {
+          name: dto.name,
           email: dto.email,
-          hash: passwordHash,
+          password: passwordHash,
         },
       });
-      delete user.hash;
+      delete user.password;
       return user;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -51,7 +52,7 @@ export class AuthService {
     }
   }
   async accessToken(
-    userId: number,
+    userId: string,
     email: string,
   ): Promise<{ access_token: string }> {
     const secret = this.config.get('JWT_SECRET');
