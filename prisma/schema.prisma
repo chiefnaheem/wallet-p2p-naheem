@@ -24,9 +24,7 @@ model Wallet {
   id          String @id @default(cuid())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  name        String
-  description String
-  balance     Int
+  balance     Int @default(10000)
   user       User @relation(fields: [userId], references: [id])
   userId      String @unique
 }
@@ -35,7 +33,7 @@ model Transaction {
   id          String @id @default(cuid())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  receiverWalletId      String
+  receiverWalletEmail      String
   senderWalletId    String
   amount      Int
   description String
