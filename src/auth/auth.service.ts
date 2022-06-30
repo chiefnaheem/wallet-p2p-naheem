@@ -54,10 +54,10 @@ export class AuthService {
       // const virtualAccount = await this.walletService.createVirtualAccount(
       //   walletDetails.customer_code,
       // );
-      const wallet = await this.prisma.wallet.create({ userId: user.id });
-      if (!wallet) return 'error occured';
+      // const wallet = await this.prisma.wallet.create({ userId: user.id });
+      // if (!wallet) return 'error occured';
       delete user.password;
-      return { user, wallet };
+      return user;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
