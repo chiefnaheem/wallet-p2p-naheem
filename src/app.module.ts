@@ -21,16 +21,16 @@ import { ConfigModule } from '@nestjs/config';
 import { WalletService } from './wallet/wallet.service';
 import { WalletController } from './wallet/wallet.controller';
 import { WalletModule } from './wallet/wallet.module';
-
+import { TransactionModule } from './transaction/transaction.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     AuthModule,
-    // UserModule,
     PrismaModule,
     WalletModule,
+    TransactionModule,
   ],
   providers: [WalletService],
   controllers: [WalletController],

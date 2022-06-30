@@ -72,4 +72,24 @@ export class WalletService {
       throw new ForbiddenException(error.message);
     }
   }
+  async verifyTransaction(reference: string) {
+    try {
+      const response = await this.httpService.get(
+        `https://api.paystack.co/transaction/verify/${reference}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.AUTH_KEY}`,
+          },
+        },
+      );
+      const result = await lastValueFrom(response);
+      if (result.data.status === false) {
+        throw new ForbiddenException(result.data.message);
+      }
+      return result.data.data;
+    } catch (error) {
+      throw new ForbiddenException(error.message);
+    }
+  }
 }
