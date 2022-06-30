@@ -23,7 +23,7 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
-
+A wallet pair-to-pair system that enables users register and get a wallet with a default balance of 0. Users are able to fund their wallet using paystack funding options and be able to make transfer of funds to other users of the system. The project is built with Node.js, Typescript, Postgrsql amongst other tools
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Installation
