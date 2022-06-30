@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { WalletService } from '../wallet/wallet.service';
 // import {AuthService} from '../auth/auth.service';
-
+import { User } from '@prisma/client';
 @Injectable()
 export class TransactionService {
   constructor(
@@ -68,5 +68,22 @@ export class TransactionService {
     }
   }
 
-  async sendMoneyToAnotherUser()
+  async sendMoneyToAnotherUser(authUser: User, dto:CreateTransactionDto){
+    try{
+
+      const user = await this.prisma.user.findUnique({
+        where: {
+
+          id: authUser.id
+        }
+      })
+      if(user.email !== dto.receiverWalletEmail)  {
+        return {message:'use your registered account to fund your account', status: false, payload: ''}
+      }
+      return await this.createTransaction(dto)
+    }catch(error) {
+      console.log(error.message)
+    }
+
+  }
 }

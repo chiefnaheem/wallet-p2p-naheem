@@ -24,4 +24,10 @@ export class TransactionController {
     return this.transactionService.createTransaction(dto);
     // return `Successfully registered`
   }
+  @HttpCode(200)
+  @Post('mywallet')
+  fundWallet(@getUser() user: User, @Body() dto: CreateTransactionDto){
+    return this.transactionService.sendMoneyToAnotherUser(user, dto)
+  }
+
 }
