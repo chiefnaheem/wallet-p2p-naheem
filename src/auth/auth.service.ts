@@ -33,9 +33,8 @@ export class AuthService {
     const passwordHash = await argon.hash(dto.password);
 
     //save the user in the database
-    
+
     try {
-     
       const user = await this.prisma.user.create({
         data: {
           firstName: dto.firstName,
@@ -45,16 +44,16 @@ export class AuthService {
           phone: dto.phone,
         },
       });
-       const wallet = await this.prisma.wallet.create({
+      const wallet = await this.prisma.wallet.create({
         data: {
-          userId: user.id
-        }
-      })
-      
+          userId: user.id,
+        },
+      });
+
       delete user.password;
-      return {user, wallet}
+      return { user, wallet };
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           throw new ForbiddenException(

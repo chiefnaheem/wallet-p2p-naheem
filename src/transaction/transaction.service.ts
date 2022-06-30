@@ -10,7 +10,7 @@ export class TransactionService {
     private readonly prisma: PrismaService,
     private walletService: WalletService,
   ) {}
-  async createTransaction(dto: CreateTransactionDto) {
+  async createTransaction(dto: CreateTransactionDto, authUser?: User) {
     const { receiverWalletEmail, amount, description } = dto;
     try {
       const reference = await this.walletService.initializeFunds(
@@ -41,35 +41,41 @@ export class TransactionService {
       if (!user) {
         throw new ForbiddenException('user not found');
       }
+      if (authUser.email === receiverWalletEmail) {
+        return {
+          status: false,
+          payload: '',
+          message: 'you cant send one to yourself',
+        };
+      }
 
       const findWallet = await this.prisma.wallet.findUnique({
         where: {
-          userId: user.id,
+          userId: authUser.id,
         },
       });
       if (!findWallet) {
         throw new ForbiddenException('wallet not found');
       }
-      findWallet.balance -= amount;
+      const setBalanceDonor = findWallet.balance - amount;
       const receiver = await this.prisma.user.findUnique({
         where: {
           email: receiverWalletEmail,
-        }
-      })
+        },
+      });
       const walletReceiver = await this.prisma.wallet.findUnique({
         where: {
-          userId: receiver.id
-        }
-
-      })
-      walletReceiver.balance += amount;
+          userId: receiver.id,
+        },
+      });
+      const setBalanceReceiver = walletReceiver.balance + amount;
 
       const balanceDonor = await this.prisma.wallet.update({
         where: {
-          userId: user.id,
+          userId: authUser.id,
         },
         data: {
-          balance: findWallet.balance,
+          balance: setBalanceDonor,
         },
       });
       const balanceReceiver = await this.prisma.wallet.update({
@@ -77,12 +83,17 @@ export class TransactionService {
           userId: receiver.id,
         },
         data: {
-          balance: walletReceiver.balance,
+          balance: setBalanceReceiver,
         },
       });
 
       console.log(verifyTransaction);
-      return balance;
+      // return {balanceDonor, balanceReceiver, transaction};
+      return {
+        status: 'success',
+        message: 'transaction successful',
+        payload: { myBalance: balanceDonor, transaction },
+      };
     } catch (error) {
       console.log(error.message);
       throw new ForbiddenException(error.message);

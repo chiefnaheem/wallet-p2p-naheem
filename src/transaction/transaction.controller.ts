@@ -21,7 +21,7 @@ export class TransactionController {
   fundMyWallet(@getUser() user: User, @Body() dto: CreateTransactionDto) {
     // console.log({ dto: dto });
     
-    return this.transactionService.createTransaction(dto);
+    return this.transactionService.createTransaction(dto, user);
     // return `Successfully registered`
   }
   @HttpCode(200)
