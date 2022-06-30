@@ -41,7 +41,7 @@ export class TransactionService {
       if (!user) {
         throw new ForbiddenException('user not found');
       }
-  
+
       const findWallet = await this.prisma.wallet.findUnique({
         where: {
           userId: user.id,
@@ -50,13 +50,34 @@ export class TransactionService {
       if (!findWallet) {
         throw new ForbiddenException('wallet not found');
       }
-      findWallet.balance += amount;
-      const balance = await this.prisma.wallet.update({
+      findWallet.balance -= amount;
+      const receiver = await this.prisma.user.findUnique({
+        where: {
+          email: receiverWalletEmail,
+        }
+      })
+      const walletReceiver = await this.prisma.wallet.findUnique({
+        where: {
+          userId: receiver.id
+        }
+
+      })
+      walletReceiver.balance += amount;
+
+      const balanceDonor = await this.prisma.wallet.update({
         where: {
           userId: user.id,
         },
         data: {
           balance: findWallet.balance,
+        },
+      });
+      const balanceReceiver = await this.prisma.wallet.update({
+        where: {
+          userId: receiver.id,
+        },
+        data: {
+          balance: walletReceiver.balance,
         },
       });
 
@@ -68,22 +89,23 @@ export class TransactionService {
     }
   }
 
-  async sendMoneyToAnotherUser(authUser: User, dto:CreateTransactionDto){
-    try{
-
+  async sendMoneyToAnotherUser(authUser: User, dto: CreateTransactionDto) {
+    try {
       const user = await this.prisma.user.findUnique({
         where: {
-
-          id: authUser.id
-        }
-      })
-      if(user.email !== dto.receiverWalletEmail)  {
-        return {message:'use your registered account to fund your account', status: false, payload: ''}
+          id: authUser.id,
+        },
+      });
+      if (user.email !== dto.receiverWalletEmail) {
+        return {
+          message: 'use your registered account to fund your account',
+          status: false,
+          payload: '',
+        };
       }
-      return await this.createTransaction(dto)
-    }catch(error) {
-      console.log(error.message)
+      return await this.createTransaction(dto);
+    } catch (error) {
+      console.log(error.message);
     }
-
   }
 }
