@@ -12,21 +12,14 @@ datasource db {
 
 model User {
   id          String @id @default(cuid())
-  name        String
+  firstName        String
+  phone       String
+  lastName        String
   email       String @unique
   password    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   wallet     Wallet?
-}
-
-model Wallet {
-  id          String @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  balance     Int @default(10000)
-  user       User @relation(fields: [userId], references: [id])
-  userId      String @unique
 }
 
 model Transaction {
@@ -37,4 +30,19 @@ model Transaction {
   senderWalletId    String
   amount      Int
   description String
+  wallet Wallet @relation(fields: [walletId], references: [id])
+  walletId String
+  reference String
 }
+
+model Wallet {
+  id          String @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // virtualAccountNumber String
+  balance     Int @default(0)
+  user       User @relation(fields: [userId], references: [id])
+  userId      String @unique
+  transactions Transaction[]
+}
+

@@ -5,12 +5,15 @@ import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { WalletService } from 'src/wallet/wallet.service';
+
 @Injectable({})
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
+    private walletService: WalletService,
   ) {}
   async login(dto: AuthDto) {
     //find the user by email
@@ -33,13 +36,28 @@ export class AuthService {
     try {
       const user = await this.prisma.user.create({
         data: {
-          name: dto.name,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
           email: dto.email,
           password: passwordHash,
+          phone: dto.phone,
         },
       });
+      // if(!user)return 'user not created'
+      // const walletDetails = await this.walletService.createCustomerPaystack({
+      //   firstName: dto.firstName,
+      //   lastName: dto.lastName,
+      //   email: dto.email,
+      //   phone: dto.phone,
+      // });
+      // // if(!walletDetails) return 'wallet not created'
+      // const virtualAccount = await this.walletService.createVirtualAccount(
+      //   walletDetails.customer_code,
+      // );
+      const wallet = await this.prisma.wallet.create({ userId: user.id });
+      if (!wallet) return 'error occured';
       delete user.password;
-      return user;
+      return { user, wallet };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {

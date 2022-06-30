@@ -18,6 +18,9 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { WalletService } from './wallet/wallet.service';
+import { WalletController } from './wallet/wallet.controller';
+import { WalletModule } from './wallet/wallet.module';
 
 @Module({
   imports: [
@@ -27,6 +30,9 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
     // UserModule,
     PrismaModule,
+    WalletModule,
   ],
+  providers: [WalletService],
+  controllers: [WalletController],
 })
 export class AppModule {}
