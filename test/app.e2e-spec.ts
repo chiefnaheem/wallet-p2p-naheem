@@ -24,7 +24,7 @@ describe('End-End Test', () => {
     await app.listen(3000);
 
     prisma = app.get(PrismaService);
-    await prisma.cleanDb();
+    // await prisma.cleanDb();
     pactum.request.setBaseUrl('http://localhost:3000');
   });
 

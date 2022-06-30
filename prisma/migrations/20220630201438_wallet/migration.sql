@@ -18,10 +18,8 @@ CREATE TABLE "Transaction" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "receiverWalletEmail" TEXT NOT NULL,
-    "senderWalletId" TEXT NOT NULL,
     "amount" INTEGER NOT NULL,
     "description" TEXT NOT NULL,
-    "walletId" TEXT NOT NULL,
     "reference" TEXT NOT NULL,
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
@@ -32,8 +30,7 @@ CREATE TABLE "Wallet" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "virtualAccountNumber" TEXT NOT NULL,
-    "balance" INTEGER NOT NULL DEFAULT 10000,
+    "balance" INTEGER NOT NULL DEFAULT 0,
     "userId" TEXT NOT NULL,
 
     CONSTRAINT "Wallet_pkey" PRIMARY KEY ("id")
@@ -44,9 +41,6 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Wallet_userId_key" ON "Wallet"("userId");
-
--- AddForeignKey
-ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_walletId_fkey" FOREIGN KEY ("walletId") REFERENCES "Wallet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Wallet" ADD CONSTRAINT "Wallet_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

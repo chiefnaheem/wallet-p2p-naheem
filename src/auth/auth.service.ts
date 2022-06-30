@@ -33,7 +33,9 @@ export class AuthService {
     const passwordHash = await argon.hash(dto.password);
 
     //save the user in the database
+    
     try {
+     
       const user = await this.prisma.user.create({
         data: {
           firstName: dto.firstName,
@@ -43,22 +45,16 @@ export class AuthService {
           phone: dto.phone,
         },
       });
-      // if(!user)return 'user not created'
-      // const walletDetails = await this.walletService.createCustomerPaystack({
-      //   firstName: dto.firstName,
-      //   lastName: dto.lastName,
-      //   email: dto.email,
-      //   phone: dto.phone,
-      // });
-      // // if(!walletDetails) return 'wallet not created'
-      // const virtualAccount = await this.walletService.createVirtualAccount(
-      //   walletDetails.customer_code,
-      // );
-      // const wallet = await this.prisma.wallet.create({ userId: user.id });
-      // if (!wallet) return 'error occured';
+       const wallet = await this.prisma.wallet.create({
+        data: {
+          userId: user.id
+        }
+      })
+      
       delete user.password;
-      return user;
+      return {user, wallet}
     } catch (error) {
+      console.log(error.message)
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           throw new ForbiddenException(
